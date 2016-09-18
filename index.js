@@ -4,8 +4,9 @@ var pg = require('pg')
 var bodyParser = require('body-parser')
 var request = require('request');
 var app = express()
-var secrets = require('./secrets.');
+var secrets = require('./Secrets');
 
+var googleMapKey = secrets.googlemaps;
 
 var config = {
   user: 'admin',
@@ -113,25 +114,38 @@ app.get('/users/:userid/analysis', stormpath.getUser, stormpath.loginRequired, f
   }
 });
 
-app.get('/locations/find/:longitdue/:latitude/:keyword', stormpath.getUser, stormpath.loginRequired, function(req, res)  {
+app.get('/locations/find/:latitude/:longitude/:keyword', stormpath.getUser, stormpath.loginRequired, function(req, res)  {
   var location = {
-    'lat':req.params.longitude,
-    'lon':req.params.latitude
+    'lat':req.params.latitude,
+    'lon':req.params.longitude
   };
   var radius = 20000;
   var keyword = req.params.keyword;
-
-  var url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?rankby=distance&location=' + location.lat + ',' + location.lon + '\&radius=' + radius + '\&keyword=' + keyword + '\&key=' + googleMapKey;
+  var url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?rankby=distance&location=' + location.lat + ',' + location.lon + '\&keyword=' + keyword + '\&key=' + googleMapKey;
   request(url , function (error, response, body) {
     if (!error && response.statusCode == 200) {
       var list = JSON.parse(body).results;
-      if (list.length == 0) return response.json({ success: true, data: "Nothing Returned"});
+      if (list.length == 0) return res.json({ success: true, data: "Nothing Returned"});
       else {
-        return response.json(list[0]);
+        var place_id = list[0].place_id;
+        var result;
+        request('https://maps.googleapis.com/maps/api/place/details/json?placeid=' + place_id + '\&key=' + googleMapKey, function(error, response, body) {
+          result = JSON.parse(body);
+          res.json(result);
+        });
       }
     }
   });
 });
+
+app.post('/location/store/:latitude/:longitude/:keyword/:id', stormpath.getUser, stormpath.loginRequired, function(req, res) {
+  var lat = req.params.latitude;
+  var long = req.params.longitude;
+  var keyword = req.params.keyword;
+  var placeid = req.params.id;
+})
+
+
 
 app.on('stormpath.ready', function () {
   console.log('Stormpath Ready');
