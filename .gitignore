@@ -1,1 +1,10 @@
 node_modules
+.tmp
+.idea
+.DS_Store
+.dist
+public/components
+/server/config/local.env.js
+npm-debug.log
+coverage
+secrets.js
