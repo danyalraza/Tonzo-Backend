@@ -138,12 +138,12 @@ app.get('/locations/find/:latitude/:longitude/:keyword', stormpath.getUser, stor
   });
 });
 
-app.post('/location/store/:latitude/:longitude/:keyword/:id', stormpath.getUser, stormpath.loginRequired, function(req, res) {
-  var lat = req.params.latitude;
-  var long = req.params.longitude;
-  var keyword = req.params.keyword;
-  var placeid = req.params.id;
-})
+// app.post('/location/store/:latitude/:longitude/:keyword/:id', stormpath.getUser, stormpath.loginRequired, function(req, res) {
+//   var lat = req.params.latitude;
+//   var long = req.params.longitude;
+//   var keyword = req.params.keyword;
+//   var placeid = req.params.id;
+// })
 
 
 
